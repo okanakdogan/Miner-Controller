@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:weightSum="1">
+
+    <ImageButton
+        android:layout_width="223dp"
+        android:layout_height="136dp"
+        android:id="@+id/hold_btn"
+        android:layout_weight="13.29"
+        android:src="@drawable/hold_open"
+        android:adjustViewBounds="false"
+        android:scaleType="fitCenter" />
+
+</LinearLayout>
