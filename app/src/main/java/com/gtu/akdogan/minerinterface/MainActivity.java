@@ -92,9 +92,8 @@ public class MainActivity extends AppCompatActivity {
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        //new Thread( new sensorUpdater()).start();
 
-        //button init
+        //button initialize
 
         connect_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -109,27 +108,19 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-/*
-        sendMSG_btn.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                if (clientSocket != null && clientSocket.isConnected()) {
-                    new sendMessageTask().execute("message");
-                }
-            }
-        });*/
-
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+
+        //Release sensors
         mSensorFus.unregisterListeners();
         sensorTimer.cancel();
 
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+        //close connections
         try {
             if(clientSocket!=null){
                 clientSocket.close();
@@ -146,6 +137,11 @@ public class MainActivity extends AppCompatActivity {
         mSensorFus.initListeners();
     }
 
+    /**
+     * Test Message send operation for socket
+     * not using!
+     */
+    @Deprecated
     private class sendMessageTask extends AsyncTask<String, Void, Void> {
 
 
@@ -167,6 +163,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Asyncronous task tosend orientation information to gamer server
+     */
     private class sendOrientation extends AsyncTask<String,Void,Void>{
 
         @Override
@@ -195,9 +194,10 @@ public class MainActivity extends AppCompatActivity {
             try {
 
                 InetAddress ia = InetAddress.getByName(ip);
-
+                // make connection
                 if (clientSocket == null) {
 
+                    //connect game server
                     clientSocket = new Socket(ia, port);
 
                     if (clientSocket.isConnected()) {
@@ -207,6 +207,7 @@ public class MainActivity extends AppCompatActivity {
                                 new OutputStreamWriter(clientSocket.getOutputStream())),
                                 true);
 
+                        // request to add player to game
                         out.println("addP");
                         System.out.println("waiting new port");
                         for(int i=0 ; i<3; ++i){
@@ -227,8 +228,10 @@ public class MainActivity extends AppCompatActivity {
                                     clientIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                                     sensorTimer.scheduleAtFixedRate(new sensorUpdater(),1000,TIME_CONSTANT);
                                 }
+                                // succesfully added
                                 conn_state = true;
 
+                                //change view to game controller
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
@@ -239,7 +242,6 @@ public class MainActivity extends AppCompatActivity {
                                 break;
                             }
                         }
-
 
                     }
                 }
@@ -253,6 +255,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Timer task that updates phone orientation information with sensor data
+     */
     class sensorUpdater extends TimerTask {
 
         @Override
@@ -268,72 +273,46 @@ public class MainActivity extends AppCompatActivity {
                     sPitch = mSensorFus.pitch;
 
                     Log.d("orient", "a:"+sAzimuth+" r:"+sRoll+" p:"+sPitch);
-                    /*
-                    int rotation = getWindowManager().getDefaultDisplay().getRotation();
-                    System.out.println(rotation);
 
-                    if (rotation == Surface.ROTATION_90) { // Landscape
-                        float pitchTemp = pitch;
-                        pitch = roll;
-                        roll = -pitchTemp;
-                        System.out.println("surface rot90");
-                    } else if (rotation == Surface.ROTATION_180) { // Reverse Portrait
-                        pitch = -pitch;
-                        roll = -roll;
-                        System.out.println("surface rot180");
-                    } else if (rotation == Surface.ROTATION_270) { // Reverse Landscape
-                        float pitchTemp = pitch;
-                        pitch = -roll;
-                        roll = pitchTemp;
-                        System.out.println("surface rot270");
-                    }
-
-                    DecimalFormat d = (DecimalFormat) NumberFormat.getNumberInstance(Locale.ENGLISH);
-                    d.setRoundingMode(RoundingMode.HALF_UP);
-                    d.setMaximumFractionDigits(2);
-                    d.setMinimumFractionDigits(2);
-
-                    sAzimuth = d.format(azimuth);
-                    sRoll = d.format(roll);
-                    sPitch = d.format(pitch);*/
-/*
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            azimuth_txtview.setText(sAzimuth);
-                            roll_txtview.setText(sRoll);
-                            pitch_txtview.setText(sPitch);
-                        }
-                    });*/
                     new sendOrientation().execute();
                 }
 
         }
     }
 
+    /**
+     * Create 2D vector from sensor data for move to player
+     * @param roll
+     * @param pitch
+     * @return
+     */
     private PointF handleSensorData(float roll,float pitch){
 
         float inner_radius=5f;
         float outter_radius=20f;
 
         float x=0,y=0;
-        if( Math.abs(roll)>5f && Math.abs(roll)<20f){
+        if( Math.abs(roll)>inner_radius && Math.abs(roll)<outter_radius){
             x=roll;
         }
-        else if(Math.abs(roll)>=20f){
-            x=Math.signum(roll)*20f;
+        else if(Math.abs(roll)>=outter_radius){
+            x=Math.signum(roll)*outter_radius;
         }
 
-        if( Math.abs(pitch)>5f && Math.abs(pitch)<20f){
+        if( Math.abs(pitch)>inner_radius && Math.abs(pitch)<outter_radius){
             y=pitch;
         }
-        else if(Math.abs(pitch)>=20f){
-            y=Math.signum(pitch)*20f;
+        else if(Math.abs(pitch)>=outter_radius){
+            y=Math.signum(pitch)*outter_radius;
         }
 
         return new PointF(x,y);
     }
 
+    /**
+     * Hold button configuration
+     * Test Stage!!!!
+     */
     private void setHoldButton(){
         ImageButton holdButton = (ImageButton)findViewById(R.id.hold_btn);
 
