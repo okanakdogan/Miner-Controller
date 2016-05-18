@@ -1,5 +1,6 @@
 package com.gtu.akdogan.minerinterface;
 
+import android.content.pm.ActivityInfo;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.hardware.SensorManager;
@@ -15,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -33,13 +35,9 @@ public class MainActivity extends AppCompatActivity {
     public static final int TIME_CONSTANT = 30;
 
     private EditText ip_txt;
-    private EditText port_txt;
-    private TextView state_txtview;
-    private TextView azimuth_txtview;
-    private TextView roll_txtview;
-    private TextView pitch_txtview;
+
     private Button connect_btn;
-    private Button sendMSG_btn;
+    private String name;
 
     //sensor vals
     private SensorFusion mSensorFus;
@@ -67,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_main);
 
         //init
@@ -99,16 +98,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 ip = ip_txt.getText().toString();
+                name = ((EditText)findViewById(R.id.username_edttxt)).getText().toString();
                 //port = Integer.parseInt(port_txt.getText().toString());
                 new Thread(new ClientThread()).start();
-                if (conn_state) {
-                    state_txtview.setText("connected");
-                }
+
             }
         });
 
 
     }
+
 
     @Override
     protected void onStop() {
@@ -141,13 +140,13 @@ public class MainActivity extends AppCompatActivity {
      * Test Message send operation for socket
      * not using!
      */
-    @Deprecated
+
     private class sendMessageTask extends AsyncTask<String, Void, Void> {
 
 
         @Override
         protected Void doInBackground(String... params) {
-            String msg = "b/msg";
+            String msg = params[0];
             try {
 
                 PrintWriter out = new PrintWriter(new BufferedWriter(
@@ -231,10 +230,16 @@ public class MainActivity extends AppCompatActivity {
                                 // succesfully added
                                 conn_state = true;
 
+                                //send name
+                                clientOut.println("setN/"+name);
+
                                 //change view to game controller
+
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
+
+                                        //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                                         setContentView(R.layout.activity_controler);
                                         setHoldButton();
                                     }
@@ -316,6 +321,15 @@ public class MainActivity extends AppCompatActivity {
     private void setHoldButton(){
         ImageButton holdButton = (ImageButton)findViewById(R.id.hold_btn);
 
+        holdButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (clientSocket != null && clientSocket.isConnected()) {
+                    new sendMessageTask().execute("br/1");
+                }
+            }
+        });
+        /*
         holdButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -333,7 +347,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 return false;
             }
-        });
+        });*/
 
     }
 }
