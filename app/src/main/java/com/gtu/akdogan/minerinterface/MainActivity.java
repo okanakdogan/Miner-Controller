@@ -320,7 +320,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void setHoldButton(){
         ImageButton holdButton = (ImageButton)findViewById(R.id.hold_btn);
-
+        ImageButton holdButton2 = (ImageButton)findViewById(R.id.hold_btn2);
         holdButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -329,25 +329,14 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-        /*
-        holdButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if(event.getAction()==MotionEvent.ACTION_DOWN){
-                    if (clientSocket != null && clientSocket.isConnected()) {
-                        new sendMessageTask().execute("bp/1");
-                    }
-                    return true;
-                }
-                else if(event.getAction()==MotionEvent.ACTION_UP){
-                    if (clientSocket != null && clientSocket.isConnected()) {
-                        new sendMessageTask().execute("br/1");
-                    }
-                    return true;
-                }
-                return false;
-            }
-        });*/
 
+        holdButton2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (clientSocket != null && clientSocket.isConnected()) {
+                    new sendMessageTask().execute("br/1");
+                }
+            }
+        });
     }
 }

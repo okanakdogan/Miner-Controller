@@ -6,11 +6,42 @@
 
     <ImageButton
         android:layout_width="223dp"
-        android:layout_height="136dp"
+        android:layout_height="wrap_content"
         android:id="@+id/hold_btn"
         android:layout_weight="13.29"
         android:src="@drawable/hold_open"
         android:adjustViewBounds="false"
+        android:scaleType="fitCenter" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="13.29"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Okan Akdoğan"
+            android:id="@+id/textView" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Mayıs 2016"
+            android:id="@+id/textView2" />
+
+    </LinearLayout>
+
+    <ImageButton
+        android:layout_width="223dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/hold_btn2"
+        android:src="@drawable/hold_open"
         android:scaleType="fitCenter" />
 
 </LinearLayout>
